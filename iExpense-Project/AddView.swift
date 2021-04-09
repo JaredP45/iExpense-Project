@@ -12,10 +12,13 @@ struct AddView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var expenses: Expenses
+    
+    static let types = ["Business", "Personal"]
+    
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount = ""
-    static let types = ["Business", "Personal"]
+    @State private var showAlert = false
     
     var body: some View {
         NavigationView {
@@ -31,6 +34,7 @@ struct AddView: View {
                     .keyboardType(.numberPad)
             }
         .navigationBarTitle("Add new expense")
+                
         .navigationBarItems(trailing:
             Button("Save"){
                 if let actualAmount = Int(self.amount)
@@ -39,8 +43,13 @@ struct AddView: View {
                     self.expenses.items.append(item)
                     self.presentationMode
                         .wrappedValue.dismiss()
+                } else {
+                    self.showAlert = true
                 }
         })
+                .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Warning!"), message: Text("You must complete the fields with the correct values!"), dismissButton: .default(Text("Okay")))
+            }
         }
     }
 }

@@ -6,6 +6,14 @@
 //  Copyright © 2021 IN185 BS. All rights reserved.
 //
 
+/*
+ !!README!!
+    Notes:
+      - Addview does not accept floating-point
+            numbers... enter integers only (maybe fix later)
+ */
+
+
 import SwiftUI
 
 struct ExpenseItem: Identifiable, Codable {
@@ -57,23 +65,31 @@ struct ContentView: View {
                             }
                             Spacer()
                             Text("$\(item.amount)")
+                                .foregroundColor( item.amount <= 10 ? .green : item.amount <= 100 ? .orange : .red )
                         }
                     }
+                    .onMove(perform: self.move)
                     .onDelete(perform: removeItems)
                 }
             .navigationBarTitle("iExpense")
-            .navigationBarItems(trailing:
+                    
+                .navigationBarItems(leading: EditButton(), trailing:
                 Button(action: {
                     self.showingAddExpense = true
                 }){
                     Image(systemName: "plus")
-                }
-            )
+                })
+                    
             .sheet(isPresented: $showingAddExpense) {
                 AddView(expenses: self.expenses)
             }
         }
     }
+    
+    func move(from source : IndexSet, to destination : Int) {
+        expenses.items.move(fromOffsets: source, toOffset: destination)
+    }
+    
     func removeItems(at offsets: IndexSet) {
         expenses.items.remove(atOffsets: offsets)
     }
